@@ -1,8 +1,20 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 app.set('json spaces', 5);
 
 app.use(express.json())
+
+
+morgan.token('info', function getInfo(req) {
+    const info = {
+        name: req.body.name,
+        number:req.body.number
+    }
+    return JSON.stringify(info)
+  })
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :info'))
 
 let data = [
     { 
@@ -64,7 +76,6 @@ const generateId = maxNum =>{
 app.post('/api/persons', (req, res)=>{
     const body = req.body
     const nameDuplicate = data.find(x=> x.name=== req.body.name)
-    console.log(nameDuplicate)
     if(!body.name || !body.number){
         return res.status(400).json({
             error: "missing name or number"
@@ -81,7 +92,6 @@ app.post('/api/persons', (req, res)=>{
         id: generateId(1000)
     }
     data = data.concat(person)
-    console.log(person)
     res.json(person)
 })
 const PORT = 3001

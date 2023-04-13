@@ -35,17 +35,22 @@ app.get('/api/persons', (req, res)=> {
 
 app.get('/info', (req, res)=> {
     const info = data.length;
-    console.log(info)
     const todayDate = new Date();
     res.send(`<pre><p>Phonebook has info for ${info} people</p><p>\n${todayDate}</p><pre>`)
 })
 
-
-
+app.get('/api/persons/:id', (req, res)=> {
+    const id = Number(req.params.id)
+    const singlePerson = data.find(x =>x.id === id)
+    if(singlePerson){
+        res.json(singlePerson)
+    }else{
+        res.status(404).end()
+    }
+    
+})
 
 const PORT = 3001
 app.listen(PORT, ()=>{
     console.log(`Server running on port ${PORT}`)
 })
-
-console.log("i am attracting developer jobs")

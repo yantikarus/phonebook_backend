@@ -33,6 +33,13 @@ app.get('/api/persons', (req, res)=> {
     res.json(data)
 })
 
+app.get('/info', (req, res)=> {
+    const info = data.length;
+    console.log(info)
+    const todayDate = new Date();
+    res.send(`<pre><p>Phonebook has info for ${info} people</p><p>\n${todayDate}</p><pre>`)
+})
+
 
 
 

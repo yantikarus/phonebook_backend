@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 app.set('json spaces', 5);
 
+app.use(express.json())
+
 let data = [
     { 
       "id": 1,
@@ -55,6 +57,33 @@ app.delete('/api/persons/:id', (req, res) =>{
     res.status(204).end()
 })
 
+const generateId = maxNum =>{
+    return Math.floor(Math.random()* maxNum)
+}
+
+app.post('/api/persons', (req, res)=>{
+    const body = req.body
+    const nameDuplicate = data.find(x=> x.name=== req.body.name)
+    console.log(nameDuplicate)
+    if(!body.name || !body.number){
+        return res.status(400).json({
+            error: "missing name or number"
+        })
+    }else if(nameDuplicate){
+        return res.status(400).json({
+            error: "name must be unique"
+        })
+
+    }
+    const person = {
+        name: body.name,
+        number:body.number,
+        id: generateId(1000)
+    }
+    data = data.concat(person)
+    console.log(person)
+    res.json(person)
+})
 const PORT = 3001
 app.listen(PORT, ()=>{
     console.log(`Server running on port ${PORT}`)

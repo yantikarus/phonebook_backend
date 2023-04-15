@@ -1,8 +1,11 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
-app.set('json spaces', 5);
+const cors = require('cors')
 
+
+app.set('json spaces', 5);
+app.use(cors())
 app.use(express.json())
 
 

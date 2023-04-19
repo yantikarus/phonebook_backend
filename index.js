@@ -72,13 +72,12 @@ const generateId = maxNum => {
 }
 
 app.put('/api/persons/:id', (req, res, next)=>{
-    const body = req.body
+    const {name, number}= req.body
 
-    const person = {
-        name:body.name,
-        number:body.number
-    }
-    Person.findByIdAndUpdate(req.params.id, person, {new:true})
+    Person.findByIdAndUpdate(
+        req.params.id,
+        {name, number}, 
+        {new:true, runValidators:true, context: 'query'})
     .then(updatedContact =>{
         res.json(updatedContact)
     })
@@ -86,17 +85,9 @@ app.put('/api/persons/:id', (req, res, next)=>{
 })
 
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
     console.log('the body request is', body)
-
-    //Todo needs to update front end to show notification if no body.name/ number supplied
-    if(!body.name || !body.number){
-        return res.status(400).json({
-            error: "missing name or number"
-        })
-    }
-    
     const person = new Person({
         name: body.name,
         number: body.number,
@@ -105,6 +96,10 @@ app.post('/api/persons', (req, res) => {
     person.save().then(savedPerson => {
         console.log("person save")
         res.json(savedPerson)
+    })
+    .catch(error => {
+        console.log(error.message)
+        next(error)
     })
 })
 const unknownEndpoint = (req, res)=>{
@@ -117,6 +112,9 @@ const errorHandler = (error, req, res, next)=>{
     console.log(error.message)
     if(error.name ==='CastError'){
         return res.status(400).send({error : 'malformatted id'})
+    }else if(error.name ==='ValidationError'){
+        console.log('validation error', error.message)
+        return res.status(400).json({error: error.message})
     }
     next(error)
 }
